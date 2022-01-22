@@ -14,15 +14,16 @@ normal index for business
 """
 class business:
 
-    def labelProportion(df:pd.DataFrame, label:str, _items:list(), _tittle:str = "Percentage", precision:int = 2) -> float:
+    def LabelProportion(df:pd.DataFrame, label:str, _items:list(), _tittle:str = "Percentage", precision:int = 2) -> float:
         """
-        proportional index
-        df: data
+        Proportional index
+        df: DataFrame
         label: feature
         _items: conditions is in label
         _tittle: name of the index
         precision: precision
         """
+        if label not in df.columns: raise Exception("Please check if {0} is correct!".format(label))
         # filter - isin label-items
         items_filter = df[label].map(lambda x: _labelcheck(x, _items))
         # get limit-df without label-items
