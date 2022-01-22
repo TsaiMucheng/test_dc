@@ -27,14 +27,6 @@ cross_element = lambda loadlist, key_list: list(c for c in loadlist if len(inter
 
 textspliter = lambda sentence, spliter: sentence.split(spliter)
 
-def labelcheck(sentence:str, referlist:list())->bool:
-    flag = False
-    if pd.isnull(sentence): return flag
-    items = textspliter(sentence, ",")
-    inter_items = inter_element(items, referlist)
-    flag = len(inter_items) > 0
-    return flag
-
 class dymModel:
     def __init__(self, *args, **kwargs):
         if len(args) != 0:

@@ -9,12 +9,51 @@ import pandas as pd
 import numpy as np
 from ._tool import *
     
-"""
-normal index for business
-"""
-class business:
+_rate = lambda c, f: int(c)/int(f)
 
-    def LabelProportion(df:pd.DataFrame, label:str, _items:list(), _tittle:str = "Percentage", precision:int = 2) -> float:
+def _labelcheck(sentence:str, referlist:list())->bool:
+    flag = False
+    if pd.isnull(sentence): return flag
+    items = textspliter(sentence, ",")
+    inter_items = inter_element(items, referlist)
+    flag = len(inter_items) > 0
+    return flag
+    
+def items_filter(df:pd.DataFrame, label:str, _items:list())->list():
+    """
+    Filter - If element of the series is in label-items
+    df: DataFrame
+    label: feature
+    _items: conditions is in label
+    """
+    if label not in df.columns: raise Exception("Please check if {0} is correct!".format(label))        
+    # filter - isin label-items
+    _items_filter = df[label].map(lambda x: _labelcheck(x, _items))
+    return _items_filter
+
+"""
+Generally proportion index for pandas
+"""
+class proportion:
+    def Assgin(df:pd.DataFrame, _items_filter:pd.Series, _items:list(), _tittle:str = "Percentage", precision:int = 2) -> float:
+        """
+        Proportional index
+        df: DataFrame
+        _items_filter: filter of the series (dtype: bool)
+        _tittle: name of the index
+        precision: precision
+        """
+        if not pd.api.types.is_bool_dtype(_items_filter): raise Exception("Please check if \'_items_filter\' is correct!")  
+        
+        # get limit-df without label-items
+        limit_df = df[_items_filter]
+        # get limit-rate
+        limit_rate = _rate(limit_df.shape[0], df.shape[0])
+        limit_rate = np.around(100 * limit_rate, precision)
+        print("{0}: {1}%".format(_tittle, limit_rate))
+        return limit_rate
+
+    def Label(df:pd.DataFrame, label:str, _items:list(), _tittle:str = "Percentage", precision:int = 2) -> float:
         """
         Proportional index
         df: DataFrame
@@ -23,16 +62,19 @@ class business:
         _tittle: name of the index
         precision: precision
         """
-        if label not in df.columns: raise Exception("Please check if {0} is correct!".format(label))
-        # filter - isin label-items
-        items_filter = df[label].map(lambda x: _labelcheck(x, _items))
+        _items_filter = items_filter(df, label, _items)
         # get limit-df without label-items
-        limit_df = df[~items_filter]
+        limit_df = df[~_items_filter]
         # get limit-rate
         limit_rate = _rate(limit_df.shape[0], df.shape[0])
         limit_rate = np.around(100 * limit_rate, precision)
         print("{0}: {1}%".format(_tittle, limit_rate))
         return limit_rate
+    
+"""
+normal index for business
+"""
+class business:
         
     def Frequency(df = None) -> np.dtype:
         """
